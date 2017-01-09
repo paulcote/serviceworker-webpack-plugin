@@ -19,8 +19,8 @@ function validatePaths(assets, options) {
 
       key = key.replace(/^\//, '');
 
-      if (options.publicPath !== '') {
-        return options.publicPath + key;
+      if (options.publicPath !== '' || options.assetsPath !== '') {
+        return (options.assetsPath ? options.assetsPath : options.publicPath) + key;
       }
 
       return basePath + key;
@@ -36,6 +36,8 @@ export default class ServiceWorkerPlugin {
   constructor(options) {
     this.options = Object.assign({
       publicPath: '',
+      assetsPath: '',
+      workerPath: '',
       excludes: ['**/.*', '**/*.map'],
       entry: null,
       filename: 'sw.js',
@@ -53,7 +55,7 @@ export default class ServiceWorkerPlugin {
         // Hijack the original module
         if (result.resource === runtimePath) {
           const data = {
-            scriptURL: this.options.publicPath + this.options.filename,
+            scriptURL: (this.options.workerPath ? this.options.workerPath : this.options.publicPath) + this.options.filename,
           };
 
           result.loaders.push(
